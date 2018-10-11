@@ -1,6 +1,6 @@
 # biz.jmaconsulting.additionalpayor
 
-This extension allows a backend user to submit or update payment on behalf of different contact.
+This extension allows a backend user to submit or update payment on behalf of a different contact.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
@@ -34,3 +34,5 @@ cv en additionalpayor
 ```
 
 ## Usage
+
+See [here](https://github.com/JMAConsulting/biz.jmaconsulting.additionalpayor/wiki/About)
