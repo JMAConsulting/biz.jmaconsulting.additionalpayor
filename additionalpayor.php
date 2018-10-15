@@ -109,11 +109,6 @@ function additionalpayor_civicrm_buildForm($formName, &$form) {
       'template' => __DIR__ . '/templates/FinancialTrxnCustom.tpl',
     ));
   }
-  if ('CRM_Contribute_Form_AdditionalPayment' == $formName) {
-    CRM_Core_Region::instance('page-body')->add(array(
-      'template' => __DIR__ . '/templates/FinancialTrxnCustom.tpl',
-    ));
-  }
   if ('CRM_Findpayment_Form_Search' == $formName) {
     CRM_Core_BAO_Query::addCustomFormFields($form, array('FinancialTrxn'));
   }
@@ -133,7 +128,7 @@ function additionalpayor_civicrm_searchColumns($contextName, &$columnHeaders, &$
 }
 
 function additionalpayor_civicrm_preProcess($formName, &$form) {
-  if (in_array($formName, ['CRM_Financial_Form_PaymentEdit', 'CRM_Contribute_Form_AdditionalPayment'])) {
+  if ($formName == 'CRM_Financial_Form_PaymentEdit') {
     $form->assign('customDataType', 'FinancialTrxn');
     $id = $form->getVar('_id');
     if ($id) {
@@ -153,24 +148,6 @@ function additionalpayor_civicrm_postProcess($formName, &$form) {
     $customValues = CRM_Core_BAO_CustomField::postProcess($form->_submitValues, $id, 'FinancialTrxn');
     if (!empty($customValues) && is_array($customValues)) {
       CRM_Core_BAO_CustomValueTable::store($customValues, 'civicrm_financial_trxn', $id);
-    }
-  }
-  elseif ('CRM_Contribute_Form_AdditionalPayment' == $formName) {
-    CRM_Core_BAO_Cache::setItem($form->_params, 'additional payment params', __FUNCTION__);
-  }
-}
-
-function additionalpayor_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  if ($op == 'create') {
-    if ($objectName == 'EntityFinancialTrxn') {
-      $params = CRM_Core_BAO_Cache::getItem('additional payment params', 'additionalpayor_civicrm_postProcess');
-      if (!empty($params) && $objectRef->entity_table == 'civicrm_financial_item') {
-        CRM_Core_BAO_Cache::deleteGroup("additional payment params");
-        $customValues = CRM_Core_BAO_CustomField::postProcess($params, $objectRef->financial_trxn_id, 'FinancialTrxn');
-        if (!empty($customValues) && is_array($customValues)) {
-          CRM_Core_BAO_CustomValueTable::store($customValues, 'civicrm_financial_trxn', $objectRef->financial_trxn_id);
-        }
-      }
     }
   }
 }
