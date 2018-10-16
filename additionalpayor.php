@@ -116,12 +116,22 @@ function additionalpayor_civicrm_buildForm($formName, &$form) {
 
 function additionalpayor_civicrm_searchColumns($contextName, &$columnHeaders, &$rows, $form) {
   if ($contextName == 'findpayment') {
-    foreach ($rows as $key => $row) {
-      foreach ($row as $column => $value) {
-        if (strstr($column, 'custom_') && !empty($value)) {
-          $rows[$key]['sort_name'] = civicrm_api3('Contact', 'getvalue', ['id' => $value, 'return' => 'sort_name']);
-          $rows[$key]['contact_id'] = $value;
-        }
+    $tableName = civicrm_api3('CustomGroup', 'getvalue', array(
+      'name' => 'additional_payor',
+      'return' => 'table_name',
+    ));
+    $customField = civicrm_api3('customField', 'getsingle', array(
+      'custom_group_id' => 'additional_payor',
+      'name' => 'additional_payor',
+    ));
+    $fieldName = 'custom_' . $customField['id'];
+    foreach ($rows as $key => &$row) {
+      if (!in_array($fieldName, array_keys($row))) {
+        $row[$fieldName] = CRM_Core_DAO::singleValueQuery(sprintf("SELECT %s FROM %s WHERE entity_id = %d ", $customField['column_name'], $tableName, $row['financialtrxn_id']));
+      }
+      if (!empty($row[$fieldName])) {
+        $row['sort_name'] = civicrm_api3('Contact', 'getvalue', ['id' => $row[$fieldName], 'return' => 'sort_name']);
+        $row['contact_id'] = $row[$fieldName];
       }
     }
   }
