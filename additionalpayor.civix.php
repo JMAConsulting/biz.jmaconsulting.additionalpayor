@@ -269,10 +269,10 @@ function _additionalpayor_civix_civicrm_managed(&$entities) {
       if (empty($e['module'])) {
         $e['module'] = E::LONG_NAME;
       }
+      $entities[] = $e;
       if (empty($e['params']['version'])) {
         $e['params']['version'] = '3';
       }
-      $entities[] = $e;
     }
   }
 }
@@ -295,7 +295,8 @@ function _additionalpayor_civix_civicrm_caseTypes(&$caseTypes) {
     $name = preg_replace('/\.xml$/', '', basename($file));
     if ($name != CRM_Case_XMLProcessor::mungeCaseType($name)) {
       $errorMessage = sprintf("Case-type file name is malformed (%s vs %s)", $name, CRM_Case_XMLProcessor::mungeCaseType($name));
-      throw new CRM_Core_Exception($errorMessage);
+      CRM_Core_Error::fatal($errorMessage);
+      // throw new CRM_Core_Exception($errorMessage);
     }
     $caseTypes[$name] = array(
       'module' => E::LONG_NAME,
